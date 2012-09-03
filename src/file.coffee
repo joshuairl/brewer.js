@@ -203,7 +203,7 @@ class File extends EventEmitter
   # object, since this source specifies the regular expression used
   # to find those directives.
   readImportedPaths: ->
-    return [] unless @source? and (regexp = @source.constructor.header)?
+    return [] unless @source? and (regexp = @source.constructor.header) and (directiveregex = @source.constructor.directive)?
     
     # Every chunk that matches the regexp pattern is concatenated
     # and the result is assumed to be a JSON array of strings,
@@ -212,7 +212,7 @@ class File extends EventEmitter
     # **TODO** : Find something better than this.
     
     recurse = (_data) ->
-      return '' unless (match = _data.match regexp)?
+      return '' unless (match = _data.match regexp) and (matchdirectives = _data.match directiveregex)?
       match[1] + recurse _data[match[0].length+match.index ...]
     
     paths = if (json = recurse (@readSync() || '')).length > 0

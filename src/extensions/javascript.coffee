@@ -42,7 +42,45 @@ class JavascriptSource extends Source
   @type = 'javascript'
   @aliases = ['js']
   @ext = '.js'
-  @header = /^\/\/\s*import\s+([a-zA-Z0-9_\-\,\.\[\]\{\}\u0022/ ]+)/m
+  
+  # FROM SPROCKETS 
+  # https://github.com/sstephenson/sprockets/blob/master/lib/sprockets/directive_processor.rb
+  # Directives will only be picked up if they are in the header
+  # of the source file. C style (/* */), JavaScript (//), and
+  # Ruby (#) comments are supported.
+  #
+  # Directives in comments after the first non-whitespace line
+  # of code will not be processed.
+  #
+  @header = ///
+      \A (
+        (?m:\s*) (
+          (\/\* (?m:.*?) \*\/) |
+          (\#\#\# (?m:.*?) \#\#\#) |
+          (\/\/ .* \n?)+ |
+          (\# .* \n?)+
+        )
+      )+
+  ///
+
+  # Directives are denoted by a `=` followed by the name, then
+  # argument list.
+  #
+  # A few different styles are allowed:
+  #
+  #     // =require foo
+  #     //= require foo
+  #     //= require "foo"
+  #
+  @directive = ///
+    ^ [\W]* = \s* (\w+.*?) (\*\/)? $
+  ///
+
+    
+    # DIRECTIVE_PATTERN = /
+    #   ^ [\W]* = \s* (\w+.*?) (\*\/)? $
+    # /x
+  # @header = /^\/\/\s*import\s+([a-zA-Z0-9_\-\,\.\[\]\{\}\u0022/ ]+)/m
 
 
 
